@@ -1,34 +1,59 @@
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-import java.lang.Number;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
-/**
- * 
- * CSCU9T4 Java strings and files exercise.
- *
- */
 public class FilesInOut {
 
     public static void main(String[] args) {
-        // Replace this with statements to set the file name (input) and file name (output).
-        // Initially it will be easier to hardcode suitable file names.
+        try {
+            boolean upperCase = false;
+            String[] inputFilePaths = {"input.txt", "inputm.txt"};
+            String outputFilePath = "formatted.txt";
 
-        // Set up a new Scanner to read the input file.
-        // Processing line by line would be sensible here.
-        // Initially, echo the text to System.out to check you are reading correctly.
-        // Then add code to modify the text to the output format.
+            if (args.length == 3 && args[0].equals("-u")) {
+                upperCase = true;
+                inputFilePaths[0] = args[1];
+                inputFilePaths[1] = args[2];
+            } else if (args.length == 2) {
+                inputFilePaths[0] = args[0];
+                inputFilePaths[1] = args[1];
+            } else {
+                System.out.println("Usage: java FormatNames [-u] input_file1 input_file2 output_file");
+                return;
+            }
 
-        // Set up a new PrintWriter to write the output file.
-        // Add suitable code into the above processing (because you need to do this line by line also.
-        // That is, read a line, write a line, loop.
+            FileWriter writer = new FileWriter(outputFilePath);
 
-        // Finally, add code to read the filenames as arguments from the command line.
+            for (String inputFilePath : inputFilePaths) {
+                BufferedReader reader = new BufferedReader(new FileReader(inputFilePath));
 
-        System.out.println("You need to add your own code to do anything");
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] tokens = line.split(" ");
+                    String firstName = capitalize(tokens[0]);
+                    String lastName = capitalize(tokens[1]);
+                    String dateOfBirth = tokens[2].substring(0, 2) + "/" + tokens[2].substring(2, 4) + "/" + tokens[2].substring(4);
 
-    } // main
+                    if (upperCase) {
+                        firstName = firstName.toUpperCase();
+                        lastName = lastName.toUpperCase();
+                    }
 
-} // FilesInOut
+                    writer.write(String.format("%-20s%s\n", firstName + " " + lastName, dateOfBirth));
+                }
+
+                reader.close();
+            }
+
+            writer.close();
+            System.out.println("Formatted file has been generated.");
+        } catch (IOException e) {
+            System.out.println("Error processing file: " + e.getMessage());
+        }
+    }
+
+    private static String capitalize(String s) {
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
+}
